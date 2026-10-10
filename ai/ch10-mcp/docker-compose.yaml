@@ -1,0 +1,30 @@
+# 第 5 节 MySQL 测试库。在工程根目录执行：docker compose up -d
+# 账号密码读取同目录 .env；首次启动会自动导入 03_MySQLMCPServerTest/sql/*.sql
+# 想重置数据：docker compose down -v && docker compose up -d
+services:
+  mysql:
+    # 官方 8.0 镜像同时支持 Intel 与 Apple Silicon（原课程的 5.7 镜像不支持 arm64）
+    image: mysql:8.0
+    container_name: ch10-mcp-mysql
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_pass_123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mcp_test}
+      MYSQL_USER: ${MYSQL_USER:-mcp_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mcp_pass_123}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./03_MySQLMCPServerTest/sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-root_pass_123}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql_data:

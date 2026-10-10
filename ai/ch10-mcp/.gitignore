@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.idea/
+output*.txt
+graph.png
+
+# 课程讲义（版权属课程方，仅本地保留，不公开）
+docs/
